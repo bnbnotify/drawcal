@@ -20,8 +20,10 @@ setup(
     name="drawcal",
     version=drawcal.__version__,
     author=drawcal.__author__,
+    install_requires=["pillow"],
     packages=find_packages("lib"),
     package_dir={"": "lib"},
+    python_requires='>=3.6',
     scripts = ["bin/drawcal"],
-    zip_safe=False
+    zip_safe=False,
 )
