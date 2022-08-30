@@ -24,6 +24,7 @@ setup(
     packages=find_packages("lib"),
     package_dir={"": "lib"},
     python_requires='>=3.6',
-    scripts = ["bin/drawcal"],
+    scripts=["bin/drawcal"],
+    data_files=[("drawcal", ["lib/drawcal/arial.ttf"])],
     zip_safe=False,
 )

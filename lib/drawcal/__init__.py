@@ -5,7 +5,7 @@ Draws calendars and events.
 """
 
 __prog__ = "drawcal"
-__version__ = "0.5.1"
+__version__ = "0.5.2"
 __author__ = "ryan@rsg.io"
 
 __todo__ = """
@@ -14,5 +14,6 @@ __todo__ = """
 
 import os
 
-LIBDIR = os.path.dirname(os.path.abspath(__file__))
-ARIAL_TTF_FILE = os.path.join(LIBDIR, "arial.ttf")
+# file paths
+LIB_DIR = os.path.dirname(os.path.abspath(__file__))
+ARIAL_TTF_FILE = os.path.join(LIB_DIR, "arial.ttf")
