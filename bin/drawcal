@@ -24,10 +24,14 @@ def parse_args():
 
     parser = argparse.ArgumentParser(prog=__prog__,
                                      description=__doc__)
-    parser.add_argument("--events", type=str, default=None)
-    parser.add_argument("--month", type=int, default=today.month)
-    parser.add_argument("--year", type=int, default=today.year)
-    parser.add_argument("--outfile", type=str, default=f"{__prog__}.png")
+    parser.add_argument("--events", type=str, default=None,
+        help="file path to json file with event data")
+    parser.add_argument("--month", type=int, default=today.month,
+        help="which month to draw (defaults to current month)")
+    parser.add_argument("--year", type=int, default=today.year,
+        help="which year to draw (defaults to current year)")
+    parser.add_argument("--outfile", type=str, default=f"{__prog__}.png",
+        help="output file path")
 
     args = parser.parse_args()
     return args

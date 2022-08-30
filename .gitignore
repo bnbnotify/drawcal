@@ -11,6 +11,5 @@ dist/
 *.egg-info/
 
 tmp/
-drawcal.png
-events.json
-output.png
+*.png
+*.json
