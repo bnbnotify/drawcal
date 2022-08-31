@@ -5,7 +5,8 @@ import sys
 from setuptools import setup, find_packages
 
 # make sure the lib is in the path
-sys.path.insert(0, os.path.abspath('lib'))
+root = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(root, "lib"))
 
 try:
     import drawcal
@@ -23,8 +24,13 @@ setup(
     install_requires=["pillow"],
     packages=find_packages("lib"),
     package_dir={"": "lib"},
+    package_data = {
+        "": ["*.py", "*.ttf"],
+    },
     python_requires='>=3.6',
     scripts=["bin/drawcal"],
-    data_files=[("drawcal", ["lib/drawcal/arial.ttf"])],
+    data_files=[
+        ("drawcal", ["lib/drawcal/arial.ttf"])
+    ],
     zip_safe=False,
 )
