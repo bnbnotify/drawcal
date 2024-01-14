@@ -5,7 +5,7 @@ Draws calendars and events.
 """
 
 __prog__ = "drawcal"
-__version__ = "0.5.3"
+__version__ = "0.5.4"
 __author__ = "ryan@rsg.io"
 
 __todo__ = """
