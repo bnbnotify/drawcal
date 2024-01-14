@@ -1,4 +1,3 @@
-
 __doc__ = """
 Contains event functions and classes.
 """
@@ -22,7 +21,7 @@ def get_events(month=today.month, year=today.year):
 
     for _ in range(2, num_events):
         event = []
-        for dd in range(i, randint(i+2, i+randint(3, 8))):
+        for dd in range(i, randint(i + 2, i + randint(3, 8))):
             event.append(f"{month}/{dd}/{year}")
             i += 1
             if i >= 31:
@@ -47,7 +46,7 @@ def read_events(filepath):
     events = []
 
     try:
-        fp =open(filepath)
+        fp = open(filepath)
         events = json.load(fp)
         fp.close()
     except Exception as e:
@@ -80,6 +79,6 @@ def test_events():
     # events = [['5/29/2022', '5/30/2022', '5/31/2022'], ['6/3/2022', '6/4/2022']]
 
     # gaps in events
-    events = [['6/3/2022', '6/4/2022', '6/5/2022', '6/6/2022', '6/7/2022']]
+    events = [["6/3/2022", "6/4/2022", "6/5/2022", "6/6/2022", "6/7/2022"]]
 
     return events

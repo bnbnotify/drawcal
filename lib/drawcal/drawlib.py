@@ -16,35 +16,37 @@ today_str = f"{_d.month}/{_d.day}/{_d.year}"
 today = datetime.strptime(today_str, "%m/%d/%Y")
 delta = timedelta(days=1)
 
+
 # global color values
 class colors:
-    background = "#ffffff" # calendar/cell background
-    border = "#f9f9f9" # calendar border
-    border_fill = "#aeaeae" # border between rows
-    cell_border = "#ee4545" # cell border color
-    checkin_text = "#212121" # checkin text color
-    checkout_text = "#252a25" # checkout text color
-    conflict = "#ff9999" # date conflicts / double events
-    conflict_border = "#ffaaaa" # date conflict border color
-    highlight = "#11ee33" # today and checkout date highlight color
-    highlight_fill = "#33ff55" # today and checkout date highlight color
-    occupied = "#ee2233" # busy/occupied date cell color
-    occupied_text = "#e9e9e9" # busy/occupied date text color
-    other = "#dededf" # dates outside current month
-    past = "#858588" # dates in the past
-    past_text = "#aaaaad" # past date text color
-    past_border = "#959598" # pdate date border color
-    text = "#787878" # default cell text color
-    title_text = "#101010" # month/year text color
+    background = "#ffffff"  # calendar/cell background
+    border = "#f9f9f9"  # calendar border
+    border_fill = "#aeaeae"  # border between rows
+    cell_border = "#ee4545"  # cell border color
+    checkin_text = "#212121"  # checkin text color
+    checkout_text = "#252a25"  # checkout text color
+    conflict = "#ff9999"  # date conflicts / double events
+    conflict_border = "#ffaaaa"  # date conflict border color
+    highlight = "#11ee33"  # today and checkout date highlight color
+    highlight_fill = "#33ff55"  # today and checkout date highlight color
+    occupied = "#ee2233"  # busy/occupied date cell color
+    occupied_text = "#e9e9e9"  # busy/occupied date text color
+    other = "#dededf"  # dates outside current month
+    past = "#858588"  # dates in the past
+    past_text = "#aaaaad"  # past date text color
+    past_border = "#959598"  # pdate date border color
+    text = "#787878"  # default cell text color
+    title_text = "#101010"  # month/year text color
 
 
-def draw_calendar(month=today.month,
-                  year=today.year,
-                  events=None,
-                  do_highlights=True,
-                  show_today=False,
-                  outfile="output.png"
-    ):
+def draw_calendar(
+    month=today.month,
+    year=today.year,
+    events=None,
+    do_highlights=True,
+    show_today=False,
+    outfile="output.png",
+):
     """
     Draws a calendar as an output png filepath. Returns a data dict of checkin,
     checkout, occupied and conflict dates.
@@ -61,7 +63,7 @@ def draw_calendar(month=today.month,
 
     :param month: month to draw.
     :param year: year to draw.
-    :param events: 
+    :param events:
     :param do_highlights: draw circles on check out events.
     :param show_today: draw square around current date.
     :param outfile: output file path to save image.
@@ -103,8 +105,9 @@ def draw_calendar(month=today.month,
     # draw the month and year
     font = ImageFont.truetype(ARIAL_TTF_FILE, size=15)
     header_w, header_h = draw.textsize(header, font=font)
-    draw.text(((width-header_w)/2, pad/2), header,
-        fill=colors.title_text, font=font)
+    draw.text(
+        ((width - header_w) / 2, pad / 2), header, fill=colors.title_text, font=font
+    )
 
     # iterate over the calendar rows
     for i, row in enumerate(rows, 1):
@@ -113,7 +116,7 @@ def draw_calendar(month=today.month,
 
         # there are 7 days in a week...
         while len(cols) < 7:
-            if i < len(rows)-1:
+            if i < len(rows) - 1:
                 cols.insert(0, "")
             else:
                 cols.append("")
@@ -125,14 +128,14 @@ def draw_calendar(month=today.month,
             y_offset = 12
         if i == 1:
             x_offset = 8
-        x1 = pad/2
-        x2 = width - pad/2
-        y1 = _h*i+(pad/2)-(y_offset+2)
+        x1 = pad / 2
+        x2 = width - pad / 2
+        y1 = _h * i + (pad / 2) - (y_offset + 2)
         y2 = y1
 
         # draw horizontal lines between rows
         if i < len(rows):
-            draw.line((x1+2, y1, x2-3, y2), width=1, fill=colors.border_fill)
+            draw.line((x1 + 2, y1, x2 - 3, y2), width=1, fill=colors.border_fill)
 
         for j, col in enumerate(cols, 0):
             _w = int(width / 8.0)
@@ -145,8 +148,8 @@ def draw_calendar(month=today.month,
             if i == 1:
                 x_offset = 8
 
-            x1 = _w * j + pad/2 + x_offset
-            y1 = _h * i + (pad/2) - y_offset
+            x1 = _w * j + pad / 2 + x_offset
+            y1 = _h * i + (pad / 2) - y_offset
 
             # begin draw events
             text_color = colors.checkin_text
@@ -167,15 +170,18 @@ def draw_calendar(month=today.month,
             # dates outside this calendar's month
             if col == "":
                 event_color = colors.other
-                draw.line((x1+s, y1+offset, x1+e-1, y1+offset), width=27,
-                    fill=event_color)
+                draw.line(
+                    (x1 + s, y1 + offset, x1 + e - 1, y1 + offset),
+                    width=27,
+                    fill=event_color,
+                )
 
-            if i>1 and col:
+            if i > 1 and col:
                 dow = int(col.strip())
                 curr_day = f"{month}/{dow}/{year}"
                 curr_date = datetime.strptime(curr_day, "%m/%d/%Y")
 
-            if (i>1 and col) and (curr_date < today):
+            if (i > 1 and col) and (curr_date < today):
                 past_date = True
 
             # iterate over calendar events (date format: mm/dd/yyyy)
@@ -191,7 +197,7 @@ def draw_calendar(month=today.month,
                 last_day = event[-1]
 
                 try:
-                    checkout_date = datetime.strptime(last_day, '%m/%d/%Y') + delta
+                    checkout_date = datetime.strptime(last_day, "%m/%d/%Y") + delta
                     checkout_day = f"{checkout_date.month}/{checkout_date.day}/{checkout_date.year}"
                 except ValueError:
                     print("invalid date!", event)
@@ -210,13 +216,16 @@ def draw_calendar(month=today.month,
                     if today_str == curr_day:
                         event_color = colors.occupied
 
-                    if (curr_day in occupied_dates or curr_day in checkin_dates) \
-                        and not past_date:
+                    if (
+                        curr_day in occupied_dates or curr_day in checkin_dates
+                    ) and not past_date:
                         conflict = True
                         conflict_dates.add(curr_day)
                         event_color = colors.conflict
 
-                    draw.pieslice((x1+13,y1-1, x1+39,y1+25), 90, 270, fill=event_color)
+                    draw.pieslice(
+                        (x1 + 13, y1 - 1, x1 + 39, y1 + 25), 90, 270, fill=event_color
+                    )
 
                     # track checkin nights
                     checkin_dates.add(curr_day)
@@ -228,12 +237,17 @@ def draw_calendar(month=today.month,
                     if today_str == checkout_day:
                         event_color = colors.past
 
-                    if (curr_day in occupied_dates or curr_day in checkout_dates) \
-                        and not past_date and curr_date != today:
+                    if (
+                        (curr_day in occupied_dates or curr_day in checkout_dates)
+                        and not past_date
+                        and curr_date != today
+                    ):
                         conflict = True
                         event_color = colors.conflict
 
-                    draw.pieslice((x1-13,y1-1, x1+13,y1+25), 270, 90, fill=event_color)
+                    draw.pieslice(
+                        (x1 - 13, y1 - 1, x1 + 13, y1 + 25), 270, 90, fill=event_color
+                    )
 
                     # track checkout nights
                     checkout_dates.add(curr_day)
@@ -243,20 +257,26 @@ def draw_calendar(month=today.month,
                     occupied = True
                     text_color = colors.border
 
-                    if (curr_day in occupied_dates or curr_day in checkin_dates or curr_day in checkout_dates) \
-                        and not past_date:
+                    if (
+                        curr_day in occupied_dates
+                        or curr_day in checkin_dates
+                        or curr_day in checkout_dates
+                    ) and not past_date:
                         conflict = True
                         conflict_dates.add(curr_day)
                         event_color = colors.conflict
 
-                    draw.line((x1+s, y1+offset, x1+e-1, y1+offset), width=27,
-                        fill=event_color)
+                    draw.line(
+                        (x1 + s, y1 + offset, x1 + e - 1, y1 + offset),
+                        width=27,
+                        fill=event_color,
+                    )
 
                     # track occupied dates
                     occupied_dates.add(curr_day)
 
             # draw vertical lines between days
-            if i>1:
+            if i > 1:
                 fill_color = colors.other
                 if occupied or checkout:
                     if conflict and not checkin:
@@ -265,19 +285,21 @@ def draw_calendar(month=today.month,
                         fill_color = colors.cell_border
                     if past_date:
                         fill_color = colors.past_border
-                draw.line((x1, y1, x1, y1+25), width=1,
-                    fill=fill_color)
+                draw.line((x1, y1, x1, y1 + 25), width=1, fill=fill_color)
 
             # end draw events
 
             # add a green circle on checkout dates
             if checkout and do_highlights:
-                draw.ellipse((x1+3,y1+3, x1+22,y1+22), fill=colors.highlight,
-                    outline=colors.highlight_fill)
+                draw.ellipse(
+                    (x1 + 3, y1 + 3, x1 + 22, y1 + 22),
+                    fill=colors.highlight,
+                    outline=colors.highlight_fill,
+                )
 
             # draw a square if current day is today
-            if show_today and (i>1 and curr_date == today):
-                draw.rectangle((x1, y1-1, x1+24, y1+25), outline=colors.highlight)
+            if show_today and (i > 1 and curr_date == today):
+                draw.rectangle((x1, y1 - 1, x1 + 24, y1 + 25), outline=colors.highlight)
 
             # draw days of the week and date numbers
             col_font = ImageFont.truetype(ARIAL_TTF_FILE, size=12)
@@ -294,21 +316,21 @@ def draw_calendar(month=today.month,
                 text_color = colors.occupied_text
 
             # text position
-            x2 = _w * j + 25 - int(col_w/2.0)
+            x2 = _w * j + 25 - int(col_w / 2.0)
             y2 = y1
-            if i>1:
-                y2 = y1+6
+            if i > 1:
+                y2 = y1 + 6
 
             # outline text for checkin/out days
-            if checkin: # or checkout:
-                draw.text((x2+1, y2), col, fill=colors.border, font=col_font)
+            if checkin:  # or checkout:
+                draw.text((x2 + 1, y2), col, fill=colors.border, font=col_font)
 
             draw.text((x2, y2), col, fill=text_color, font=col_font)
 
     # draw borders
     draw.line((0, 0, 0, height), width=22, fill=colors.border)
-    draw.line((width-2, 0, width-2, height), width=30, fill=colors.border)
-    draw.line((0, height+5, width, height+5), width=20, fill=colors.border)
+    draw.line((width - 2, 0, width - 2, height), width=30, fill=colors.border)
+    draw.line((0, height + 5, width, height + 5), width=20, fill=colors.border)
 
     # save the file
     img.save(outfile, "PNG")
@@ -319,7 +341,7 @@ def draw_calendar(month=today.month,
         "checkouts": sorted(list(checkout_dates)),
         "conflicts": sorted(list(conflict_dates)),
         "occupied": sorted(list(occupied_dates)),
-        "outfile": outfile
+        "outfile": outfile,
     }
 
 
