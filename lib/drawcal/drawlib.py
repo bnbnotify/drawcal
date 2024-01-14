@@ -38,15 +38,45 @@ class colors:
     title_text = "#101010" # month/year text color
 
 
-def draw_calendar(month=today.month, year=today.year, events=None,
-                  do_highlights=True, outfile="output.png"):
-    """Draws a calendar as an output png filepath. Returns a data dict of checkin,
-    checkout, occupied and conflict dates."""
+def draw_calendar(month=today.month,
+                  year=today.year,
+                  events=None,
+                  do_highlights=True,
+                  show_today=False,
+                  outfile="output.png"
+    ):
+    """
+    Draws a calendar as an output png filepath. Returns a data dict of checkin,
+    checkout, occupied and conflict dates.
 
-    # set some initial global values
+    Output:
+
+        {
+            "checkins": sorted(list(checkin_dates)),
+            "checkouts": sorted(list(checkout_dates)),
+            "conflicts": sorted(list(conflict_dates)),
+            "occupied": sorted(list(occupied_dates)),
+            "outfile": outfile
+        }
+
+    :param month: month to draw.
+    :param year: year to draw.
+    :param events: 
+    :param do_highlights: draw circles on check out events.
+    :param show_today: draw square around current date.
+    :param outfile: output file path to save image.
+
+    :returns: dictionary containing grouped events and outfile
+    """
+
+    # set some initial values
     width = 200
     height = 200
     pad = 20
+
+    # make sure events is a list
+    if events == None:
+        events = []
 
     # categorize and track dates
     conflict_dates = set()
@@ -246,7 +276,7 @@ def draw_calendar(month=today.month, year=today.year, events=None,
                     outline=colors.highlight_fill)
 
             # draw a square if current day is today
-            if i>1 and curr_date == today:
+            if show_today and (i>1 and curr_date == today):
                 draw.rectangle((x1, y1-1, x1+24, y1+25), outline=colors.highlight)
 
             # draw days of the week and date numbers
@@ -291,3 +321,12 @@ def draw_calendar(month=today.month, year=today.year, events=None,
         "occupied": sorted(list(occupied_dates)),
         "outfile": outfile
     }
+
+
+if __name__ == "__main__":
+    from drawcal.events import get_events
+
+    events = get_events()
+    outfile = "/var/tmp/drawcal-test.png"
+    results = draw_calendar(events=events, outfile=outfile)
+    print(results)
