@@ -30,9 +30,10 @@
 #
 
 __doc__ = """
-Draws calendars and events.
+Contains drawcal default config settings.
 """
 
-__prog__ = "drawcal"
-__version__ = "0.5.4"
-__author__ = "ryan@rsgalloway.com"
+import os
+
+LIB_DIR = os.path.dirname(os.path.abspath(__file__))
+ARIAL_TTF_FILE = os.path.join(LIB_DIR, "arial.ttf")

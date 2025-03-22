@@ -37,7 +37,7 @@ import calendar
 from datetime import datetime, timedelta
 from PIL import Image, ImageFont, ImageDraw
 
-from drawcal import ARIAL_TTF_FILE
+from drawcal import config
 
 # set some global date values
 _d = datetime.today()
@@ -132,7 +132,7 @@ def draw_calendar(
     draw = ImageDraw.Draw(img)
 
     # draw the month and year
-    font = ImageFont.truetype(ARIAL_TTF_FILE, size=15)
+    font = ImageFont.truetype(config.ARIAL_TTF_FILE, size=15)
     header_w, header_h = draw.textsize(header, font=font)
     draw.text(
         ((width - header_w) / 2, pad / 2), header, fill=colors.title_text, font=font
@@ -331,7 +331,7 @@ def draw_calendar(
                 draw.rectangle((x1, y1 - 1, x1 + 24, y1 + 25), outline=colors.highlight)
 
             # draw days of the week and date numbers
-            col_font = ImageFont.truetype(ARIAL_TTF_FILE, size=12)
+            col_font = ImageFont.truetype(config.ARIAL_TTF_FILE, size=12)
             col_w, col_h = draw.textsize(col, font=col_font)
 
             # set date text color
