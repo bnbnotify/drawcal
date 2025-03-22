@@ -40,7 +40,6 @@ from drawcal import __prog__, __version__
 from drawcal.drawlib import draw_calendar
 from drawcal.events import get_events, read_events
 
-
 d = datetime.today()
 today_str = f"{d.month}/{d.day}/{d.year}"
 today = datetime.strptime(today_str, "%m/%d/%Y")
@@ -51,16 +50,41 @@ def parse_args():
     """Parses and returns command line arguments."""
     import argparse
 
-    parser = argparse.ArgumentParser(prog=__prog__,
-                                     description=__doc__)
-    parser.add_argument("--events", type=str, default=None,
-        help="file path to json file with event data")
-    parser.add_argument("--month", type=int, default=today.month,
-        help="which month to draw (defaults to current month)")
-    parser.add_argument("--year", type=int, default=today.year,
-        help="which year to draw (defaults to current year)")
-    parser.add_argument("--outfile", type=str, default=f"{__prog__}.png",
-        help="output file path")
+    parser = argparse.ArgumentParser(prog=__prog__, description=__doc__)
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="version",
+        version=f"envstack {__version__}",
+    )
+    parser.add_argument(
+        "--events",
+        metavar="EVENTSFILE",
+        type=str,
+        default=None,
+        help="file path to json file with event data",
+    )
+    parser.add_argument(
+        "--month",
+        metavar="MONTH",
+        type=int,
+        default=today.month,
+        help="which month to draw (defaults to current month)",
+    )
+    parser.add_argument(
+        "--year",
+        metavar="YEAR",
+        type=int,
+        default=today.year,
+        help="which year to draw (defaults to current year)",
+    )
+    parser.add_argument(
+        "--outfile",
+        metavar="OUTFILE",
+        type=str,
+        default=f"{__prog__}.png",
+        help="output file path",
+    )
 
     args = parser.parse_args()
     return args
@@ -76,12 +100,7 @@ def main():
     else:
         events = get_events(args.month, args.year)
 
-    draw_calendar(
-        month=args.month,
-        year=args.year,
-        events=events,
-        outfile=args.outfile
-    )
+    draw_calendar(month=args.month, year=args.year, events=events, outfile=args.outfile)
 
     return 0
 
