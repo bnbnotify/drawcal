@@ -30,13 +30,61 @@
 #
 
 __doc__ = """
-Contains a distable executable for the drawcal cli.py module.
+Contains command line wrapper functions and classes.
 """
 
-import re
 import sys
-from drawcal.cli import main
+from datetime import datetime, timedelta
+
+from drawcal import __prog__, __version__
+from drawcal.drawlib import draw_calendar
+from drawcal.events import get_events, read_events
+
+
+d = datetime.today()
+today_str = f"{d.month}/{d.day}/{d.year}"
+today = datetime.strptime(today_str, "%m/%d/%Y")
+delta = timedelta(days=1)
+
+
+def parse_args():
+    """Parses and returns command line arguments."""
+    import argparse
+
+    parser = argparse.ArgumentParser(prog=__prog__,
+                                     description=__doc__)
+    parser.add_argument("--events", type=str, default=None,
+        help="file path to json file with event data")
+    parser.add_argument("--month", type=int, default=today.month,
+        help="which month to draw (defaults to current month)")
+    parser.add_argument("--year", type=int, default=today.year,
+        help="which year to draw (defaults to current year)")
+    parser.add_argument("--outfile", type=str, default=f"{__prog__}.png",
+        help="output file path")
+
+    args = parser.parse_args()
+    return args
+
+
+def main():
+    """Main event loop."""
+
+    args = parse_args()
+
+    if args.events:
+        events = read_events(args.events)
+    else:
+        events = get_events(args.month, args.year)
+
+    draw_calendar(
+        month=args.month,
+        year=args.year,
+        events=events,
+        outfile=args.outfile
+    )
+
+    return 0
+
 
 if __name__ == "__main__":
-    sys.argv[0] = re.sub(r"(-script\.pyw|\.exe)?$", "", sys.argv[0])
     sys.exit(main())
