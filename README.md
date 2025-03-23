@@ -1,7 +1,7 @@
 drawcal
 =======
 
-Python library for drawing a calendar images with events.
+Python library for drawing simple monthly calendar images with events.
 
 <img src="drawcal.png" alt="drwacal clendar image" />
 
