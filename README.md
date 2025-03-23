@@ -15,8 +15,8 @@ $ pip install -U drawcal
 
 ## Quickstart
 
-Generate a calendar image for a given month:
+Generate a calendar image for a given events file:
 
 ```bash
-$ drawcal [--month MM] [--year YYYY]
+$ drawcal --events events.json
 ```
