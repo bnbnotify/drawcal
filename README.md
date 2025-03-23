@@ -18,5 +18,12 @@ $ pip install -U drawcal
 Generate a calendar image for a given events file:
 
 ```bash
-$ drawcal --events events.json
+$ drawcal --events events.json --month 3 --year 2025
+```
+
+Python:
+
+```python
+>>> from drawcal import draw_calendar
+>>> draw_calendar(month, year, events=events, outfile=outfile)
 ```
