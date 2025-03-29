@@ -35,5 +35,12 @@ Contains drawcal default config settings.
 
 import os
 
+from envstack.util import safe_eval
+
 LIB_DIR = os.path.dirname(os.path.abspath(__file__))
 ARIAL_TTF_FILE = os.path.join(LIB_DIR, "arial.ttf")
+
+# calendar drawing settings
+DRAW_MARKER_CHECKIN = safe_eval(os.getenv("DRAW_MARKER_CHECKIN", False))
+DRAW_MARKER_CHECKOUT = safe_eval(os.getenv("DRAW_MARKER_CHECKOUT", True))
+DRAW_MARKER_TODAY = safe_eval(os.getenv("DRAW_MARKER_TODAY", False))

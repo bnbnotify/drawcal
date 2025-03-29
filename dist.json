@@ -1,0 +1,17 @@
+{
+    "author": "ryan@rsgalloway.com",
+    "targets": {
+        "bin": {
+            "source": "bin/drawcal",
+            "destination": "{DEPLOY_ROOT}/bin/drawcal"
+        },
+        "lib": {
+            "source": "lib/drawcal",
+            "destination": "{DEPLOY_ROOT}/lib/python/drawcal"
+        },
+        "env": {
+            "source": "drawcal.env",
+            "destination": "{DEPLOY_ROOT}/env/drawcal.env"
+        }
+    }
+}
