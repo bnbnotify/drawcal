@@ -72,8 +72,8 @@ def draw_calendar(
     month=today.month,
     year=today.year,
     events=None,
-    do_highlights=True,
-    show_today=False,
+    do_highlights=config.DRAW_MARKER_CHECKOUT,
+    show_today=config.DRAW_MARKER_TODAY,
     outfile="output.png",
 ):
     """
@@ -339,7 +339,7 @@ def draw_calendar(
                 text_color = colors.past_text
             else:
                 text_color = colors.text
-            if checkout:
+            if checkout and do_highlights:
                 text_color = colors.checkout_text
             elif occupied:
                 text_color = colors.occupied_text
