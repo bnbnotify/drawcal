@@ -13,6 +13,12 @@ The easiest way to install:
 $ pip install -U drawcal
 ```
 
+Alternatively, to install with distman:
+
+```bash
+$ dist [-d]
+```
+
 ## Quickstart
 
 Generate a calendar image for a given events file:
