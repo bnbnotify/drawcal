@@ -55,7 +55,7 @@ def parse_args():
         "-v",
         "--version",
         action="version",
-        version=f"envstack {__version__}",
+        version=f"drawcal {__version__}",
     )
     parser.add_argument(
         "--events",
@@ -82,7 +82,7 @@ def parse_args():
         "--outfile",
         metavar="OUTFILE",
         type=str,
-        default=f"{__prog__}.png",
+        default="drawcal.png",
         help="output file path",
     )
 

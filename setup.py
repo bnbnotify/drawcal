@@ -38,7 +38,7 @@ with open(os.path.join(here, "README.md")) as f:
 
 setup(
     name="drawcal",
-    version="0.5.5",
+    version="0.5.6",
     author="Ryan Galloway",
     author_email="ryan@rsgalloway.com",
     url="https://github.com/bnbnotify/drawcal",
@@ -59,7 +59,7 @@ setup(
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
     ],
-    install_requires=["pillow", "envstack"],
+    install_requires=["Pillow==9.0.1", "envstack>=0.8.3"],
     packages=find_packages("lib"),
     package_dir={"": "lib"},
     package_data = {

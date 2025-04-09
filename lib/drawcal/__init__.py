@@ -34,10 +34,11 @@ Draws calendars and events.
 """
 
 __prog__ = "drawcal"
-__version__ = "0.5.5"
+__version__ = "0.5.6"
 __author__ = "ryan@rsgalloway.com"
 
 import envstack
+
 envstack.init(__prog__)
 
 from drawcal.drawlib import draw_calendar

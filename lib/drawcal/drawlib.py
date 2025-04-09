@@ -74,7 +74,7 @@ def draw_calendar(
     events=None,
     do_highlights=config.DRAW_MARKER_CHECKOUT,
     show_today=config.DRAW_MARKER_TODAY,
-    outfile="output.png",
+    outfile="drawcal.png",
 ):
     """
     Draws a calendar as an output png filepath. Returns a data dict of checkin,
@@ -372,12 +372,3 @@ def draw_calendar(
         "occupied": sorted(list(occupied_dates)),
         "outfile": outfile,
     }
-
-
-if __name__ == "__main__":
-    from drawcal.events import get_events
-
-    events = get_events()
-    outfile = "/var/tmp/drawcal-test.png"
-    results = draw_calendar(events=events, outfile=outfile)
-    print(results)
