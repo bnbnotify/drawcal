@@ -91,6 +91,9 @@ class ValidateEventsTests(unittest.TestCase):
             ]
         )
 
+    def test_validate_events_accepts_marker_only_events(self):
+        validate_events([{"markers": ["3/14/2022", "3/17/2022"]}])
+
 
 class NormalizeEventsTests(unittest.TestCase):
     def test_normalize_events_supports_legacy_lists(self):
@@ -139,3 +142,10 @@ class NormalizeEventsTests(unittest.TestCase):
                     }
                 ]
             )
+
+    def test_normalize_events_supports_marker_only_schema(self):
+        normalized = normalize_events([{"markers": ["3/16/2022"]}])
+
+        self.assertFalse(normalized[0].has_range)
+        self.assertEqual(normalized[0].dates, [])
+        self.assertEqual(normalized[0].to_dict()["markers"], ["3/16/2022"])

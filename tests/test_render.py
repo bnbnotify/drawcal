@@ -130,3 +130,13 @@ class RenderTests(unittest.TestCase):
             with Image.open(outfile) as image:
                 expected = ImageColor.getrgb("#123456")
                 self.assertEqual(image.getpixel((163, 53))[:3], expected)
+
+    def test_marker_only_events_are_supported(self):
+        result, _ = self._render(
+            month=3,
+            year=2025,
+            events=[{"markers": ["3/5/2025", "3/18/2025"]}],
+        )
+
+        self.assertEqual(result["occupied"], [])
+        self.assertEqual(result["checkins"], [])

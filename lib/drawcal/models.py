@@ -58,15 +58,22 @@ def format_date(value: datetime) -> str:
 
 @dataclass(frozen=True)
 class Event:
-    start_date: datetime
-    end_date: datetime
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
     color: Optional[str] = None
     style: str = DEFAULT_STYLE
     markers: Optional[List[datetime]] = None
     legacy: bool = False
 
     def validate(self) -> "Event":
-        if self.end_date < self.start_date:
+        if self.start_date is None or self.end_date is None:
+            if self.start_date is not None or self.end_date is not None:
+                raise ValueError("start_date and end_date must be provided together")
+            if not self.markers:
+                raise ValueError(
+                    "event must define a date range or at least one marker"
+                )
+        elif self.end_date < self.start_date:
             raise ValueError("end_date must be on or after start_date")
         if self.style not in VALID_STYLES:
             raise ValueError(f"style must be one of: {', '.join(sorted(VALID_STYLES))}")
@@ -76,12 +83,22 @@ class Event:
             if not isinstance(self.markers, list):
                 raise ValueError("markers must be a list of date strings")
             for marker in self.markers:
-                if marker < self.start_date or marker > self.end_date:
+                if (
+                    self.start_date is not None
+                    and self.end_date is not None
+                    and (marker < self.start_date or marker > self.end_date)
+                ):
                     raise ValueError("markers must fall within the event date range")
         return self
 
     @property
+    def has_range(self) -> bool:
+        return self.start_date is not None and self.end_date is not None
+
+    @property
     def dates(self) -> List[str]:
+        if not self.has_range:
+            return []
         dates = []
         current = self.start_date
         while current <= self.end_date:
@@ -91,17 +108,21 @@ class Event:
 
     @property
     def start_date_str(self) -> str:
+        if self.start_date is None:
+            raise ValueError("event does not define start_date")
         return format_date(self.start_date)
 
     @property
     def end_date_str(self) -> str:
+        if self.end_date is None:
+            raise ValueError("event does not define end_date")
         return format_date(self.end_date)
 
     def to_dict(self) -> Dict[str, Any]:
-        data = {
-            "start_date": self.start_date_str,
-            "end_date": self.end_date_str,
-        }
+        data = {}
+        if self.has_range:
+            data["start_date"] = self.start_date_str
+            data["end_date"] = self.end_date_str
         if self.color is not None:
             data["color"] = self.color
         if self.style != DEFAULT_STYLE:
@@ -136,8 +157,12 @@ def _event_from_mapping(value: Dict[str, Any]) -> Event:
         keys = ", ".join(sorted(unknown_keys))
         raise ValueError(f"unsupported event field(s): {keys}")
 
-    start_date = parse_date(value.get("start_date"), "start_date")
-    end_date = parse_date(value.get("end_date"), "end_date")
+    start_date = value.get("start_date")
+    end_date = value.get("end_date")
+    if start_date is not None:
+        start_date = parse_date(start_date, "start_date")
+    if end_date is not None:
+        end_date = parse_date(end_date, "end_date")
     color = value.get("color")
     style = value.get("style", DEFAULT_STYLE)
     markers = value.get("markers")

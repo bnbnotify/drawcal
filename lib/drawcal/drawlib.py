@@ -293,10 +293,15 @@ def draw_calendar(
                     event_color = colors.past
 
                 event_dates = event.dates
-                first_day = event.start_date_str
-                last_day = event.end_date_str
-                is_explicit_end = (not event.legacy) and curr_day == last_day
-                is_explicit_start = curr_day == first_day
+                first_day = None
+                last_day = None
+                is_explicit_end = False
+                is_explicit_start = False
+                if event.has_range:
+                    first_day = event.start_date_str
+                    last_day = event.end_date_str
+                    is_explicit_end = (not event.legacy) and curr_day == last_day
+                    is_explicit_start = curr_day == first_day
                 marker_days = set()
                 if event.markers:
                     marker_days = {
@@ -305,7 +310,7 @@ def draw_calendar(
                     }
 
                 checkout_day = None
-                if event.legacy:
+                if event.legacy and last_day:
                     try:
                         checkout_date = datetime.strptime(last_day, "%m/%d/%Y") + delta
                         checkout_day = f"{checkout_date.month}/{checkout_date.day}/{checkout_date.year}"
@@ -314,10 +319,10 @@ def draw_calendar(
                         continue
 
                 # handle each day in event
-                if first_day == curr_day:
+                if curr_day and first_day == curr_day:
                     s = 0
                 # check-in
-                if first_day == curr_day:
+                if curr_day and first_day == curr_day:
                     checkin = True
                     text_color = colors.checkin_text
                     if event.color is None and today_str == curr_day:
@@ -346,7 +351,7 @@ def draw_calendar(
                     checkin_dates.add(curr_day)
 
                 # check-out
-                elif checkout_day and curr_day == checkout_day:
+                elif curr_day and checkout_day and curr_day == checkout_day:
                     checkout = True
                     text_color = colors.border
                     if today_str == checkout_day:
@@ -370,7 +375,7 @@ def draw_calendar(
                     checkout_dates.add(curr_day)
 
                 # occupied
-                elif curr_day in event_dates:
+                elif curr_day and curr_day in event_dates:
                     occupied = True
                     text_color = colors.border
 
@@ -398,7 +403,7 @@ def draw_calendar(
                     # track occupied dates
                     occupied_dates.add(curr_day)
 
-                if curr_day in marker_days:
+                if curr_day and curr_day in marker_days:
                     marker = True
 
             # draw vertical lines between days
