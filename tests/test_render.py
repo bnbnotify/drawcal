@@ -34,3 +34,11 @@ class RenderTests(unittest.TestCase):
                 self.assertIsNone(
                     diff.getbbox(), "rendered image does not match fixture"
                 )
+
+    def test_draw_calendar_rejects_gapped_events(self):
+        with self.assertRaisesRegex(ValueError, "consecutive with no gaps"):
+            draw_calendar(
+                month=6,
+                year=2022,
+                events=[["6/3/2022", "6/6/2022", "6/7/2022"]],
+            )

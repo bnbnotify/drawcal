@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2022-2025, Bnbnotify
+# Copyright (c) 2022-2026, Bnbnotify
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -41,6 +41,32 @@ d = datetime.today()
 today_str = f"{d.month}/{d.day}/{d.year}"
 today = datetime.strptime(today_str, "%m/%d/%Y")
 delta = timedelta(days=1)
+
+
+def validate_events(events):
+    """Validate drawcal event payloads."""
+
+    if not isinstance(events, list):
+        raise ValueError("events must be a list of event lists")
+
+    for event in events:
+        if not isinstance(event, list):
+            raise ValueError("each event must be a list of date strings")
+
+        parsed_days = []
+        for day in event:
+            if not isinstance(day, str):
+                raise ValueError("each event date must be a string in M/D/YYYY format")
+            try:
+                parsed_days.append(datetime.strptime(day, "%m/%d/%Y"))
+            except (TypeError, ValueError) as exc:
+                raise ValueError(f"invalid event date: {day}") from exc
+
+        for previous, current in zip(parsed_days, parsed_days[1:]):
+            if current <= previous:
+                raise ValueError("event dates must be in strictly increasing order")
+            if current - previous != delta:
+                raise ValueError("event dates must be consecutive with no gaps")
 
 
 def get_events(month=today.month, year=today.year):
@@ -86,18 +112,9 @@ def read_events(filepath):
     except json.JSONDecodeError as exc:
         raise ValueError(f"invalid JSON in events file: {filepath}") from exc
 
-    if not isinstance(events, list):
-        raise ValueError("events file must contain a list of event lists")
-
-    for event in events:
-        if not isinstance(event, list):
-            raise ValueError("each event must be a list of date strings")
-        for day in event:
-            if not isinstance(day, str):
-                raise ValueError("each event date must be a string in M/D/YYYY format")
-            try:
-                datetime.strptime(day, "%m/%d/%Y")
-            except (TypeError, ValueError) as exc:
-                raise ValueError(f"invalid event date: {day}") from exc
+    try:
+        validate_events(events)
+    except ValueError as exc:
+        raise ValueError(f"invalid events file: {exc}") from exc
 
     return events

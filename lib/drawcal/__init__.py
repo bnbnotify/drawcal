@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2022-2025, Bnbnotify
+# Copyright (c) 2022-2026, Bnbnotify
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -34,7 +34,7 @@ Draws calendars and events.
 """
 
 __prog__ = "drawcal"
-__version__ = "0.5.8"
+__version__ = "0.5.9"
 __author__ = "ryan@rsgalloway.com"
 
 
