@@ -242,9 +242,6 @@ def draw_calendar(
                 # handle each day in event
                 if first_day == curr_day:
                     s = 0
-                if last_day == curr_day:
-                    e = 22
-
                 # check-in
                 if first_day == curr_day:
                     checkin = True
