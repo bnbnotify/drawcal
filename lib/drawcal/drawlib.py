@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2022-2025, Bnbnotify
+# Copyright (c) 2022-2026, Bnbnotify
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -38,6 +38,7 @@ from datetime import datetime, timedelta
 from PIL import Image, ImageFont, ImageDraw
 
 from drawcal import config
+from drawcal.events import validate_events
 
 # set some global date values
 _d = datetime.today()
@@ -115,6 +116,8 @@ def draw_calendar(
     # make sure events is a list
     if events is None:
         events = []
+    else:
+        validate_events(events)
 
     # categorize and track dates
     conflict_dates = set()
