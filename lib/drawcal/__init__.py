@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2022-2025, Ryan Galloway (ryan@rsgalloway.com)
+# Copyright (c) 2022-2025, Bnbnotify
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -34,11 +34,13 @@ Draws calendars and events.
 """
 
 __prog__ = "drawcal"
-__version__ = "0.5.6"
+__version__ = "0.5.7"
 __author__ = "ryan@rsgalloway.com"
 
-import envstack
 
-envstack.init(__prog__)
+def draw_calendar(*args, **kwargs):
+    """Lazily import the renderer so package metadata stays cheap to import."""
 
-from drawcal.drawlib import draw_calendar
+    from drawcal.drawlib import draw_calendar as _draw_calendar
+
+    return _draw_calendar(*args, **kwargs)

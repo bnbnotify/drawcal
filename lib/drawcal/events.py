@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2022-2025, Ryan Galloway (ryan@rsgalloway.com)
+# Copyright (c) 2022-2025, Bnbnotify
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -34,6 +34,7 @@ Contains event functions and classes.
 """
 
 import json
+from calendar import monthrange
 from datetime import datetime, timedelta
 
 d = datetime.today()
@@ -47,17 +48,20 @@ def get_events(month=today.month, year=today.year):
     from random import randint
 
     events = []
+    last_day = monthrange(year, month)[1]
     num_events = randint(2, 8)
     i = 1
 
     for _ in range(2, num_events):
         event = []
         for dd in range(i, randint(i + 2, i + randint(3, 8))):
+            if dd > last_day:
+                break
             event.append(f"{month}/{dd}/{year}")
             i += 1
-            if i >= 31:
+            if i > last_day:
                 break
-        if i >= 31:
+        if i > last_day:
             break
         i += randint(1, 10)
         if event:
@@ -74,13 +78,24 @@ def get_events(month=today.month, year=today.year):
 def read_events(filepath):
     """Returns JSON serialized events from a given filepath."""
 
-    events = []
-
     try:
-        fp = open(filepath)
-        events = json.load(fp)
-        fp.close()
-    except Exception as e:
-        print(e)
+        with open(filepath, encoding="utf-8") as fp:
+            events = json.load(fp)
+    except OSError as exc:
+        raise OSError(f"unable to read events file: {filepath}") from exc
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"invalid JSON in events file: {filepath}") from exc
+
+    if not isinstance(events, list):
+        raise ValueError("events file must contain a list of event lists")
+
+    for event in events:
+        if not isinstance(event, list):
+            raise ValueError("each event must be a list of date strings")
+        for day in event:
+            try:
+                datetime.strptime(day, "%m/%d/%Y")
+            except ValueError as exc:
+                raise ValueError(f"invalid event date: {day}") from exc
 
     return events

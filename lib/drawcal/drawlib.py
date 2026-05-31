@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2022-2025, Ryan Galloway (ryan@rsgalloway.com)
+# Copyright (c) 2022-2025, Bnbnotify
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -68,6 +68,13 @@ class colors:
     title_text = "#101010"  # month/year text color
 
 
+def _text_size(draw, text, font):
+    """Return text width/height across Pillow versions."""
+
+    left, top, right, bottom = draw.textbbox((0, 0), text, font=font)
+    return right - left, bottom - top
+
+
 def draw_calendar(
     month=today.month,
     year=today.year,
@@ -106,7 +113,7 @@ def draw_calendar(
     pad = 20
 
     # make sure events is a list
-    if events == None:
+    if events is None:
         events = []
 
     # categorize and track dates
@@ -133,7 +140,7 @@ def draw_calendar(
 
     # draw the month and year
     font = ImageFont.truetype(config.ARIAL_TTF_FILE, size=15)
-    header_w, header_h = draw.textsize(header, font=font)
+    header_w, header_h = _text_size(draw, header, font)
     draw.text(
         ((width - header_w) / 2, pad / 2), header, fill=colors.title_text, font=font
     )
@@ -233,9 +240,9 @@ def draw_calendar(
                     continue
 
                 # handle each day in event
-                if first_day == col:
+                if first_day == curr_day:
                     s = 0
-                if last_day == col:
+                if last_day == curr_day:
                     e = 22
 
                 # check-in
@@ -332,7 +339,7 @@ def draw_calendar(
 
             # draw days of the week and date numbers
             col_font = ImageFont.truetype(config.ARIAL_TTF_FILE, size=12)
-            col_w, col_h = draw.textsize(col, font=col_font)
+            col_w, col_h = _text_size(draw, col, col_font)
 
             # set date text color
             if past_date:
