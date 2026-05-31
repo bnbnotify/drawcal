@@ -7,16 +7,24 @@ Python library for drawing simple monthly calendar images with events.
 
 ## Installation
 
-The easiest way to install:
+Install from PyPI:
 
 ```bash
 $ pip install -U drawcal
 ```
 
-Alternatively, to install with distman:
+Build locally:
 
 ```bash
-$ dist [-d]
+$ python -m pip install --upgrade build
+$ python -m build
+```
+
+Upload to PyPI:
+
+```bash
+$ python -m pip install --upgrade twine
+$ python -m twine upload dist/*
 ```
 
 ## Quickstart
@@ -32,4 +40,16 @@ Python:
 ```python
 >>> from drawcal import draw_calendar
 >>> draw_calendar(month, year, events=events, outfile=outfile)
+```
+
+## Events format
+
+`drawcal` expects a JSON file containing a list of events, where each event is a
+list of dates in `M/D/YYYY` format:
+
+```json
+[
+  ["3/1/2025", "3/2/2025", "3/3/2025"],
+  ["3/14/2025", "3/15/2025"]
+]
 ```

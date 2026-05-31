@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2022-2025, Ryan Galloway (ryan@rsgalloway.com)
+# Copyright (c) 2022-2025, Bnbnotify
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -37,7 +37,6 @@ import sys
 from datetime import datetime, timedelta
 
 from drawcal import __prog__, __version__
-from drawcal.drawlib import draw_calendar
 from drawcal.events import get_events, read_events
 
 d = datetime.today()
@@ -92,6 +91,9 @@ def parse_args():
 
 def main():
     """Main event loop."""
+    import envstack
+
+    envstack.init(__prog__)
 
     args = parse_args()
 
@@ -99,6 +101,8 @@ def main():
         events = read_events(args.events)
     else:
         events = get_events(args.month, args.year)
+
+    from drawcal.drawlib import draw_calendar
 
     draw_calendar(month=args.month, year=args.year, events=events, outfile=args.outfile)
 
