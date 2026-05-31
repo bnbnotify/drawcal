@@ -78,6 +78,7 @@ def parse_args():
         help="which year to draw (defaults to current year)",
     )
     parser.add_argument(
+        "-o",
         "--outfile",
         metavar="OUTFILE",
         type=str,

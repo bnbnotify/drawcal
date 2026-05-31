@@ -20,6 +20,17 @@ FIXED_TODAY = datetime.strptime("1/1/2026", "%m/%d/%Y")
 
 
 class RenderTests(unittest.TestCase):
+    def _render(self, month, year, events):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            outfile = Path(tmpdir) / "render.png"
+            result = draw_calendar(
+                month=month,
+                year=year,
+                events=events,
+                outfile=str(outfile),
+            )
+            return result, outfile
+
     def _assert_render_matches_fixture(self, events_file, expected_image):
         events = json.loads(events_file.read_text(encoding="utf-8"))
 
@@ -50,7 +61,7 @@ class RenderTests(unittest.TestCase):
         )
 
     def test_draw_calendar_accepts_dict_events(self):
-        draw_calendar(
+        self._render(
             month=3,
             year=2025,
             events=[
@@ -64,7 +75,7 @@ class RenderTests(unittest.TestCase):
         )
 
     def test_dict_events_do_not_draw_implicit_checkout_day(self):
-        result = draw_calendar(
+        result, _ = self._render(
             month=3,
             year=2025,
             events=[
@@ -79,7 +90,7 @@ class RenderTests(unittest.TestCase):
         self.assertNotIn("3/6/2025", result["checkouts"])
 
     def test_legacy_events_keep_implicit_checkout_day(self):
-        result = draw_calendar(
+        result, _ = self._render(
             month=3,
             year=2025,
             events=[["3/1/2025", "3/2/2025", "3/3/2025", "3/4/2025", "3/5/2025"]],
