@@ -2,6 +2,7 @@
     {
         "start_date": "3/1/2025",
         "end_date": "3/5/2025",
+        "color": "#ff3300",
         "markers": ["3/5/2025"],
         "style": "rounded"
     },

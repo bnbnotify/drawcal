@@ -76,6 +76,19 @@ def _text_size(draw, text, font):
     return right - left, bottom - top
 
 
+def _lighten_color(color, amount=0.3):
+    """Return a slightly lighter hex color."""
+
+    if not isinstance(color, str) or not color.startswith("#") or len(color) != 7:
+        return color
+
+    rgb = [int(color[index : index + 2], 16) for index in (1, 3, 5)]
+    adjusted = []
+    for channel in rgb:
+        adjusted.append(min(255, int(channel + ((255 - channel) * amount))))
+    return "#{:02x}{:02x}{:02x}".format(*adjusted)
+
+
 def _draw_event_segment(draw, x1, y1, color, style, is_start, is_end):
     """Draw one event cell using the configured cap style."""
 
@@ -244,6 +257,8 @@ def draw_calendar(
             occupied = False
             past_date = False
             conflict = False
+            cell_border_color = None
+            explicit_event_color = False
             curr_day = None
             curr_date = None
 
@@ -271,8 +286,10 @@ def draw_calendar(
 
             # iterate over calendar events (date format: mm/dd/yyyy)
             for event in normalized_events:
+                event_color = event.color or colors.occupied
+
                 # change event color of past dates
-                if past_date:
+                if past_date and event.color is None:
                     event_color = colors.past
 
                 event_dates = event.dates
@@ -303,7 +320,7 @@ def draw_calendar(
                 if first_day == curr_day:
                     checkin = True
                     text_color = colors.checkin_text
-                    if today_str == curr_day:
+                    if event.color is None and today_str == curr_day:
                         event_color = colors.occupied
 
                     if (
@@ -322,6 +339,8 @@ def draw_calendar(
                         is_explicit_start,
                         is_explicit_end,
                     )
+                    cell_border_color = _lighten_color(event_color)
+                    explicit_event_color = event.color is not None
 
                     # track checkin nights
                     checkin_dates.add(curr_day)
@@ -344,6 +363,8 @@ def draw_calendar(
                     draw.pieslice(
                         (x1 - 13, y1 - 1, x1 + 13, y1 + 25), 270, 90, fill=event_color
                     )
+                    cell_border_color = _lighten_color(event_color)
+                    explicit_event_color = event.color is not None
 
                     # track checkout nights
                     checkout_dates.add(curr_day)
@@ -371,6 +392,8 @@ def draw_calendar(
                         is_explicit_start,
                         is_explicit_end,
                     )
+                    cell_border_color = _lighten_color(event_color)
+                    explicit_event_color = event.color is not None
 
                     # track occupied dates
                     occupied_dates.add(curr_day)
@@ -384,11 +407,11 @@ def draw_calendar(
                 if occupied or checkout:
                     if conflict and not checkin:
                         fill_color = colors.conflict_border
+                    elif cell_border_color:
+                        fill_color = cell_border_color
                     else:
                         fill_color = colors.cell_border
-                    if past_date:
-                        fill_color = colors.past_border
-                draw.line((x1, y1, x1, y1 + 25), width=1, fill=fill_color)
+                draw.line((x1, y1 - 1, x1, y1 + 25), width=1, fill=fill_color)
 
             # end draw events
 
