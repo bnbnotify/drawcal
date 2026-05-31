@@ -12,14 +12,16 @@ import drawcal.drawlib as drawlib
 
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
-EXPECTED_IMAGE = FIXTURES_DIR / "march-2025-expected.png"
-EVENTS_FILE = FIXTURES_DIR / "march-2025-events.json"
+LEGACY_EXPECTED_IMAGE = FIXTURES_DIR / "march-2025-expected.png"
+LEGACY_EVENTS_FILE = FIXTURES_DIR / "march-2025-events.json"
+STRUCTURED_EXPECTED_IMAGE = FIXTURES_DIR / "march-2025-expected-v2.png"
+STRUCTURED_EVENTS_FILE = FIXTURES_DIR / "march-2025-events-v2.json"
 FIXED_TODAY = datetime.strptime("1/1/2026", "%m/%d/%Y")
 
 
 class RenderTests(unittest.TestCase):
-    def test_draw_calendar_matches_expected_image(self):
-        events = json.loads(EVENTS_FILE.read_text(encoding="utf-8"))
+    def _assert_render_matches_fixture(self, events_file, expected_image):
+        events = json.loads(events_file.read_text(encoding="utf-8"))
 
         with tempfile.TemporaryDirectory() as tmpdir:
             outfile = Path(tmpdir) / "render.png"
@@ -29,11 +31,23 @@ class RenderTests(unittest.TestCase):
             ):
                 draw_calendar(month=3, year=2025, events=events, outfile=str(outfile))
 
-            with Image.open(EXPECTED_IMAGE) as expected, Image.open(outfile) as actual:
+            with Image.open(expected_image) as expected, Image.open(outfile) as actual:
                 diff = ImageChops.difference(expected, actual)
                 self.assertIsNone(
                     diff.getbbox(), "rendered image does not match fixture"
                 )
+
+    def test_draw_calendar_matches_legacy_fixture(self):
+        self._assert_render_matches_fixture(
+            LEGACY_EVENTS_FILE,
+            LEGACY_EXPECTED_IMAGE,
+        )
+
+    def test_draw_calendar_matches_structured_fixture(self):
+        self._assert_render_matches_fixture(
+            STRUCTURED_EVENTS_FILE,
+            STRUCTURED_EXPECTED_IMAGE,
+        )
 
     def test_draw_calendar_accepts_dict_events(self):
         draw_calendar(
