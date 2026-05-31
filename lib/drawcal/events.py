@@ -93,9 +93,11 @@ def read_events(filepath):
         if not isinstance(event, list):
             raise ValueError("each event must be a list of date strings")
         for day in event:
+            if not isinstance(day, str):
+                raise ValueError("each event date must be a string in M/D/YYYY format")
             try:
                 datetime.strptime(day, "%m/%d/%Y")
-            except ValueError as exc:
+            except (TypeError, ValueError) as exc:
                 raise ValueError(f"invalid event date: {day}") from exc
 
     return events
