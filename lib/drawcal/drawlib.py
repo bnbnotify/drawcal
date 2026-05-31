@@ -38,7 +38,7 @@ from datetime import datetime, timedelta
 from PIL import Image, ImageFont, ImageDraw
 
 from drawcal import config
-from drawcal.events import validate_events
+from drawcal.models import normalize_events
 
 # set some global date values
 _d = datetime.today()
@@ -74,6 +74,64 @@ def _text_size(draw, text, font):
 
     left, top, right, bottom = draw.textbbox((0, 0), text, font=font)
     return right - left, bottom - top
+
+
+def _lighten_color(color, amount=0.3):
+    """Return a slightly lighter hex color."""
+
+    if not isinstance(color, str) or not color.startswith("#") or len(color) != 7:
+        return color
+
+    rgb = [int(color[index : index + 2], 16) for index in (1, 3, 5)]
+    adjusted = []
+    for channel in rgb:
+        adjusted.append(min(255, int(channel + ((255 - channel) * amount))))
+    return "#{:02x}{:02x}{:02x}".format(*adjusted)
+
+
+def _draw_event_segment(draw, x1, y1, color, style, is_start, is_end):
+    """Draw one event cell using the configured cap style."""
+
+    top = y1 - 1
+    bottom = y1 + 25
+    left = x1
+    right = x1 + 25
+    center = x1 + 12
+
+    if style == "filled":
+        draw.line((left, y1 + 12, right - 1, y1 + 12), width=27, fill=color)
+        return
+
+    if style == "diagonal":
+        if is_start and is_end:
+            draw.polygon(
+                [(center, top), (right, y1 + 12), (center, bottom), (left, y1 + 12)],
+                fill=color,
+            )
+            return
+        if is_start:
+            draw.polygon(
+                [(left, bottom), (right, top), (right, bottom)],
+                fill=color,
+            )
+            return
+        if is_end:
+            draw.polygon(
+                [(left, top), (left, bottom), (right, top)],
+                fill=color,
+            )
+            return
+        draw.line((left, y1 + 12, right - 1, y1 + 12), width=27, fill=color)
+        return
+
+    if is_start and is_end:
+        draw.ellipse((left, top, right, bottom), fill=color)
+    elif is_start:
+        draw.pieslice((x1 + 13, top, x1 + 39, bottom), 90, 270, fill=color)
+    elif is_end:
+        draw.pieslice((x1 - 13, top, x1 + 13, bottom), 270, 90, fill=color)
+    else:
+        draw.line((left, y1 + 12, right - 1, y1 + 12), width=27, fill=color)
 
 
 def draw_calendar(
@@ -115,9 +173,9 @@ def draw_calendar(
 
     # make sure events is a list
     if events is None:
-        events = []
+        normalized_events = []
     else:
-        validate_events(events)
+        normalized_events = normalize_events(events)
 
     # categorize and track dates
     conflict_dates = set()
@@ -195,9 +253,11 @@ def draw_calendar(
             event_color = colors.occupied
             checkin = False
             checkout = False
+            marker = False
             occupied = False
             past_date = False
             conflict = False
+            cell_border_color = None
             curr_day = None
             curr_date = None
 
@@ -224,32 +284,46 @@ def draw_calendar(
                 past_date = True
 
             # iterate over calendar events (date format: mm/dd/yyyy)
-            for event in events:
-                if not event:
-                    continue
+            for event in normalized_events:
+                event_color = event.color or colors.occupied
 
                 # change event color of past dates
-                if past_date:
+                if past_date and event.color is None:
                     event_color = colors.past
 
-                first_day = event[0]
-                last_day = event[-1]
+                first_day = None
+                last_day = None
+                is_explicit_end = False
+                is_explicit_start = False
+                if event.has_range:
+                    first_day = event.start_date_str
+                    last_day = event.end_date_str
+                    is_explicit_end = (not event.legacy) and curr_day == last_day
+                    is_explicit_start = curr_day == first_day
+                marker_days = set()
+                if event.markers:
+                    marker_days = {
+                        f"{marker.month}/{marker.day}/{marker.year}"
+                        for marker in event.markers
+                    }
 
-                try:
-                    checkout_date = datetime.strptime(last_day, "%m/%d/%Y") + delta
-                    checkout_day = f"{checkout_date.month}/{checkout_date.day}/{checkout_date.year}"
-                except ValueError:
-                    print("invalid date!", event)
-                    continue
+                checkout_day = None
+                if event.legacy and last_day:
+                    try:
+                        checkout_date = datetime.strptime(last_day, "%m/%d/%Y") + delta
+                        checkout_day = f"{checkout_date.month}/{checkout_date.day}/{checkout_date.year}"
+                    except ValueError:
+                        print("invalid date!", event)
+                        continue
 
                 # handle each day in event
-                if first_day == curr_day:
+                if curr_day and first_day == curr_day:
                     s = 0
                 # check-in
-                if first_day == curr_day:
+                if curr_day and first_day == curr_day:
                     checkin = True
                     text_color = colors.checkin_text
-                    if today_str == curr_day:
+                    if event.color is None and today_str == curr_day:
                         event_color = colors.occupied
 
                     if (
@@ -259,15 +333,22 @@ def draw_calendar(
                         conflict_dates.add(curr_day)
                         event_color = colors.conflict
 
-                    draw.pieslice(
-                        (x1 + 13, y1 - 1, x1 + 39, y1 + 25), 90, 270, fill=event_color
+                    _draw_event_segment(
+                        draw,
+                        x1,
+                        y1,
+                        event_color,
+                        event.style,
+                        is_explicit_start,
+                        is_explicit_end,
                     )
+                    cell_border_color = _lighten_color(event_color)
 
                     # track checkin nights
                     checkin_dates.add(curr_day)
 
                 # check-out
-                elif curr_day == checkout_day:
+                elif curr_day and checkout_day and curr_day == checkout_day:
                     checkout = True
                     text_color = colors.border
                     if today_str == checkout_day:
@@ -284,12 +365,18 @@ def draw_calendar(
                     draw.pieslice(
                         (x1 - 13, y1 - 1, x1 + 13, y1 + 25), 270, 90, fill=event_color
                     )
+                    cell_border_color = _lighten_color(event_color)
 
                     # track checkout nights
                     checkout_dates.add(curr_day)
 
                 # occupied
-                elif curr_day in event:
+                elif (
+                    curr_date
+                    and event.start_date is not None
+                    and event.end_date is not None
+                    and event.start_date <= curr_date <= event.end_date
+                ):
                     occupied = True
                     text_color = colors.border
 
@@ -302,14 +389,22 @@ def draw_calendar(
                         conflict_dates.add(curr_day)
                         event_color = colors.conflict
 
-                    draw.line(
-                        (x1 + s, y1 + offset, x1 + e - 1, y1 + offset),
-                        width=27,
-                        fill=event_color,
+                    _draw_event_segment(
+                        draw,
+                        x1,
+                        y1,
+                        event_color,
+                        event.style,
+                        is_explicit_start,
+                        is_explicit_end,
                     )
+                    cell_border_color = _lighten_color(event_color)
 
                     # track occupied dates
                     occupied_dates.add(curr_day)
+
+                if curr_day and curr_day in marker_days:
+                    marker = True
 
             # draw vertical lines between days
             if i > 1:
@@ -317,16 +412,16 @@ def draw_calendar(
                 if occupied or checkout:
                     if conflict and not checkin:
                         fill_color = colors.conflict_border
+                    elif cell_border_color:
+                        fill_color = cell_border_color
                     else:
                         fill_color = colors.cell_border
-                    if past_date:
-                        fill_color = colors.past_border
-                draw.line((x1, y1, x1, y1 + 25), width=1, fill=fill_color)
+                draw.line((x1, y1 - 1, x1, y1 + 25), width=1, fill=fill_color)
 
             # end draw events
 
             # add a green circle on checkout dates
-            if checkout and do_highlights:
+            if (checkout and do_highlights) or marker:
                 draw.ellipse(
                     (x1 + 3, y1 + 3, x1 + 22, y1 + 22),
                     fill=colors.highlight,
@@ -346,7 +441,7 @@ def draw_calendar(
                 text_color = colors.past_text
             else:
                 text_color = colors.text
-            if checkout and do_highlights:
+            if (checkout and do_highlights) or marker:
                 text_color = colors.checkout_text
             elif occupied:
                 text_color = colors.occupied_text

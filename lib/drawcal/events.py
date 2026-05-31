@@ -37,6 +37,8 @@ import json
 from calendar import monthrange
 from datetime import datetime, timedelta
 
+from drawcal.models import normalize_events
+
 d = datetime.today()
 today_str = f"{d.month}/{d.day}/{d.year}"
 today = datetime.strptime(today_str, "%m/%d/%Y")
@@ -45,28 +47,7 @@ delta = timedelta(days=1)
 
 def validate_events(events):
     """Validate drawcal event payloads."""
-
-    if not isinstance(events, list):
-        raise ValueError("events must be a list of event lists")
-
-    for event in events:
-        if not isinstance(event, list):
-            raise ValueError("each event must be a list of date strings")
-
-        parsed_days = []
-        for day in event:
-            if not isinstance(day, str):
-                raise ValueError("each event date must be a string in M/D/YYYY format")
-            try:
-                parsed_days.append(datetime.strptime(day, "%m/%d/%Y"))
-            except (TypeError, ValueError) as exc:
-                raise ValueError(f"invalid event date: {day}") from exc
-
-        for previous, current in zip(parsed_days, parsed_days[1:]):
-            if current <= previous:
-                raise ValueError("event dates must be in strictly increasing order")
-            if current - previous != delta:
-                raise ValueError("event dates must be consecutive with no gaps")
+    normalize_events(events)
 
 
 def get_events(month=today.month, year=today.year):
