@@ -13,20 +13,6 @@ Install from PyPI:
 $ pip install -U drawcal
 ```
 
-Build locally:
-
-```bash
-$ python -m pip install --upgrade build
-$ python -m build
-```
-
-Upload to PyPI:
-
-```bash
-$ python -m pip install --upgrade twine
-$ python -m twine upload dist/*
-```
-
 ## Quickstart
 
 Generate a calendar image for a given events file:
