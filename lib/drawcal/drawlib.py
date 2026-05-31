@@ -258,7 +258,6 @@ def draw_calendar(
             past_date = False
             conflict = False
             cell_border_color = None
-            explicit_event_color = False
             curr_day = None
             curr_date = None
 
@@ -292,7 +291,6 @@ def draw_calendar(
                 if past_date and event.color is None:
                     event_color = colors.past
 
-                event_dates = event.dates
                 first_day = None
                 last_day = None
                 is_explicit_end = False
@@ -345,7 +343,6 @@ def draw_calendar(
                         is_explicit_end,
                     )
                     cell_border_color = _lighten_color(event_color)
-                    explicit_event_color = event.color is not None
 
                     # track checkin nights
                     checkin_dates.add(curr_day)
@@ -369,13 +366,17 @@ def draw_calendar(
                         (x1 - 13, y1 - 1, x1 + 13, y1 + 25), 270, 90, fill=event_color
                     )
                     cell_border_color = _lighten_color(event_color)
-                    explicit_event_color = event.color is not None
 
                     # track checkout nights
                     checkout_dates.add(curr_day)
 
                 # occupied
-                elif curr_day and curr_day in event_dates:
+                elif (
+                    curr_date
+                    and event.start_date is not None
+                    and event.end_date is not None
+                    and event.start_date <= curr_date <= event.end_date
+                ):
                     occupied = True
                     text_color = colors.border
 
@@ -398,7 +399,6 @@ def draw_calendar(
                         is_explicit_end,
                     )
                     cell_border_color = _lighten_color(event_color)
-                    explicit_event_color = event.color is not None
 
                     # track occupied dates
                     occupied_dates.add(curr_day)

@@ -94,6 +94,10 @@ class ValidateEventsTests(unittest.TestCase):
     def test_validate_events_accepts_marker_only_events(self):
         validate_events([{"markers": ["3/14/2022", "3/17/2022"]}])
 
+    def test_validate_events_rejects_non_datetime_markers_on_event_instance(self):
+        with self.assertRaisesRegex(ValueError, "markers must be datetime values"):
+            Event(markers=["3/14/2022"]).validate()
+
 
 class NormalizeEventsTests(unittest.TestCase):
     def test_normalize_events_supports_legacy_lists(self):

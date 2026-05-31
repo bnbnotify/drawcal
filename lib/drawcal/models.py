@@ -81,8 +81,10 @@ class Event:
             raise ValueError("color must be a string when provided")
         if self.markers is not None:
             if not isinstance(self.markers, list):
-                raise ValueError("markers must be a list of date strings")
+                raise ValueError("markers must be a list")
             for marker in self.markers:
+                if not isinstance(marker, datetime):
+                    raise ValueError("markers must be datetime values")
                 if (
                     self.start_date is not None
                     and self.end_date is not None
