@@ -57,6 +57,7 @@ def parse_args():
         version=f"drawcal {__version__}",
     )
     parser.add_argument(
+        "-e",
         "--events",
         metavar="EVENTSFILE",
         type=str,
@@ -64,6 +65,7 @@ def parse_args():
         help="file path to json file with event data",
     )
     parser.add_argument(
+        "-m",
         "--month",
         metavar="MONTH",
         type=int,
@@ -71,6 +73,7 @@ def parse_args():
         help="which month to draw (defaults to current month)",
     )
     parser.add_argument(
+        "-y",
         "--year",
         metavar="YEAR",
         type=int,

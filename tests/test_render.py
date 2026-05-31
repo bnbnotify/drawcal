@@ -43,7 +43,10 @@ class RenderTests(unittest.TestCase):
                 draw_calendar(month=3, year=2025, events=events, outfile=str(outfile))
 
             with Image.open(expected_image) as expected, Image.open(outfile) as actual:
-                diff = ImageChops.difference(expected, actual)
+                diff = ImageChops.difference(
+                    expected.convert("RGB"),
+                    actual.convert("RGB"),
+                )
                 self.assertIsNone(
                     diff.getbbox(), "rendered image does not match fixture"
                 )

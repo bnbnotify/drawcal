@@ -111,13 +111,13 @@ def _draw_event_segment(draw, x1, y1, color, style, is_start, is_end):
             return
         if is_start:
             draw.polygon(
-                [(left, bottom), (right, top), (right, bottom)],
+                [(left + 1, bottom), (right + 2, top), (right + 1, bottom)],
                 fill=color,
             )
             return
         if is_end:
             draw.polygon(
-                [(left, top), (left, bottom), (right, top)],
+                [(left - 1, top), (left - 2, bottom), (right - 1, top)],
                 fill=color,
             )
             return
