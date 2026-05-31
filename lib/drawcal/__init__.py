@@ -34,7 +34,7 @@ Draws calendars and events.
 """
 
 __prog__ = "drawcal"
-__version__ = "0.5.9"
+__version__ = "0.6.0"
 __author__ = "ryan@rsgalloway.com"
 
 
