@@ -35,6 +35,44 @@ class RenderTests(unittest.TestCase):
                     diff.getbbox(), "rendered image does not match fixture"
                 )
 
+    def test_draw_calendar_accepts_dict_events(self):
+        draw_calendar(
+            month=3,
+            year=2025,
+            events=[
+                {
+                    "start_date": "3/1/2025",
+                    "end_date": "3/5/2025",
+                    "style": "filled",
+                    "markers": ["3/1/2025", "3/5/2025"],
+                }
+            ],
+        )
+
+    def test_dict_events_do_not_draw_implicit_checkout_day(self):
+        result = draw_calendar(
+            month=3,
+            year=2025,
+            events=[
+                {
+                    "start_date": "3/1/2025",
+                    "end_date": "3/5/2025",
+                    "style": "filled",
+                }
+            ],
+        )
+
+        self.assertNotIn("3/6/2025", result["checkouts"])
+
+    def test_legacy_events_keep_implicit_checkout_day(self):
+        result = draw_calendar(
+            month=3,
+            year=2025,
+            events=[["3/1/2025", "3/2/2025", "3/3/2025", "3/4/2025", "3/5/2025"]],
+        )
+
+        self.assertIn("3/6/2025", result["checkouts"])
+
     def test_draw_calendar_rejects_gapped_events(self):
         with self.assertRaisesRegex(ValueError, "consecutive with no gaps"):
             draw_calendar(

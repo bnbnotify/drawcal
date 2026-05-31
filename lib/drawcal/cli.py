@@ -97,14 +97,27 @@ def main():
 
     args = parse_args()
 
-    if args.events:
-        events = read_events(args.events)
-    else:
-        events = get_events(args.month, args.year)
+    try:
+        if args.events:
+            events = read_events(args.events)
+        else:
+            events = get_events(args.month, args.year)
+    except (OSError, ValueError) as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        return 1
 
     from drawcal.drawlib import draw_calendar
 
-    draw_calendar(month=args.month, year=args.year, events=events, outfile=args.outfile)
+    try:
+        draw_calendar(
+            month=args.month,
+            year=args.year,
+            events=events,
+            outfile=args.outfile,
+        )
+    except ValueError as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        return 1
 
     return 0
 
